@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Victory Fitness Co. — Maintenance Calorie Calculator</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #000000;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #FFFFFF;
+  }
+  .container {
+    background: #000000;
+    color: #FFFFFF;
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid #B99358;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 0 60px rgba(185, 147, 88, 0.18);
+  }
+  .logo-link {
+    display: block;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .logo-link:hover { opacity: 0.85; }
+  .logo-link img {
+    max-width: 240px;
+    width: 100%;
+    height: auto;
+    display: inline-block;
+  }
+  .header { margin-bottom: 1.75rem; text-align: center; }
+  .title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #B99358;
+    margin: 0 0 6px;
+    letter-spacing: -0.5px;
+  }
+  .subtitle { font-size: 13px; color: #B99358; opacity: 0.7; margin: 0; }
+
+  .label {
+    display: block;
+    font-size: 12px;
+    color: #B99358;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .toggle-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 1.5rem;
+  }
+  .toggle-group { display: flex; gap: 6px; }
+
+  button {
+    flex: 1;
+    background: transparent;
+    color: #FFFFFF;
+    border: 1px solid #2a2a2a;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  button:hover { border-color: #B99358; }
+  button.active {
+    background: #B99358;
+    color: #000000;
+    border-color: #B99358;
+    font-weight: 600;
+  }
+
+  .slider-block { margin-bottom: 1.25rem; }
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .slider-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #B99358;
+  }
+  input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: #1f1f1f;
+    border-radius: 2px;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #B99358;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #000000;
+    box-shadow: 0 0 8px rgba(185, 147, 88, 0.5);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #B99358;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #000000;
+  }
+
+  .activity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+  .activity-btn {
+    text-align: left;
+    padding: 12px;
+    line-height: 1.4;
+  }
+  .activity-btn .name {
+    font-weight: 600;
+    margin-bottom: 3px;
+    font-size: 13px;
+    color: #FFFFFF;
+  }
+  .activity-btn .desc {
+    color: #B99358;
+    opacity: 0.75;
+    font-size: 11px;
+  }
+  .activity-btn.active .name { color: #000000; }
+  .activity-btn.active .desc { color: rgba(0, 0, 0, 0.7); opacity: 1; }
+  .span-2 { grid-column: span 2; }
+
+  .result-card {
+    background: #0a0a0a;
+    border: 1px solid #B99358;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: inset 0 0 20px rgba(185, 147, 88, 0.05);
+  }
+  .result-main { text-align: center; margin-bottom: 1.25rem; }
+  .result-label {
+    font-size: 11px;
+    color: #B99358;
+    opacity: 0.85;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .result-number {
+    font-size: 48px;
+    font-weight: 600;
+    color: #B99358;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .result-unit { font-size: 16px; color: #FFFFFF; opacity: 0.6; font-weight: 400; }
+  .result-meta {
+    font-size: 12px;
+    color: #FFFFFF;
+    opacity: 0.6;
+    margin-top: 8px;
+  }
+  .result-meta span { color: #B99358; opacity: 1; }
+
+  .goal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .goal-card {
+    background: #000000;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .goal-card.featured { border-color: #B99358; }
+  .goal-label {
+    font-size: 10px;
+    color: #FFFFFF;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .goal-card.featured .goal-label { color: #B99358; opacity: 1; }
+  .goal-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: #B99358;
+    margin-bottom: 4px;
+  }
+  .goal-pace { font-size: 10px; color: #FFFFFF; opacity: 0.5; }
+
+  .footer {
+    font-size: 11px;
+    color: #FFFFFF;
+    opacity: 0.4;
+    text-align: center;
+    line-height: 1.6;
+    margin-top: 1rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a class="logo-link" href="https://victoryfitnessco.com/" target="_blank" rel="noopener noreferrer">
+    <img src="data:image/jpeg;base64,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" alt="Victory Fitness Co." />
+  </a>
+
+  <div class="header">
+    <h1 class="title">Maintenance calorie calculator</h1>
+    <p class="subtitle">Mifflin-St Jeor equation × activity multiplier</p>
+  </div>
+
+  <div class="toggle-row">
+    <div>
+      <div class="label">Sex</div>
+      <div class="toggle-group" id="sex-group">
+        <button class="active" data-sex="male">Male</button>
+        <button data-sex="female">Female</button>
+      </div>
+    </div>
+    <div>
+      <div class="label">Units</div>
+      <div class="toggle-group" id="unit-group">
+        <button class="active" data-unit="imperial">Imperial</button>
+        <button data-unit="metric">Metric</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="slider-block">
+    <div class="slider-header">
+      <span class="label" style="margin: 0;">Age</span>
+      <span class="slider-value" id="age-out">30 years</span>
+    </div>
+    <input type="range" id="age" min="15" max="80" value="30" step="1" />
+  </div>
+
+  <div class="slider-block">
+    <div class="slider-header">
+      <span class="label" style="margin: 0;">Height</span>
+      <span class="slider-value" id="height-out">5'10"</span>
+    </div>
+    <input type="range" id="height" min="48" max="84" value="70" step="1" />
+  </div>
+
+  <div class="slider-block">
+    <div class="slider-header">
+      <span class="label" style="margin: 0;">Weight</span>
+      <span class="slider-value" id="weight-out">170 lbs</span>
+    </div>
+    <input type="range" id="weight" min="80" max="400" value="170" step="1" />
+  </div>
+
+  <div class="label">Activity level</div>
+  <div class="activity-grid" id="activity-grid">
+    <button class="activity-btn" data-mult="1.2" data-label="sedentary">
+      <div class="name">Sedentary</div>
+      <div class="desc">Desk job, no exercise</div>
+    </button>
+    <button class="activity-btn" data-mult="1.375" data-label="light">
+      <div class="name">Light</div>
+      <div class="desc">Exercise 1-3 days/wk</div>
+    </button>
+    <button class="activity-btn active" data-mult="1.55" data-label="moderate">
+      <div class="name">Moderate</div>
+      <div class="desc">Exercise 3-5 days/wk</div>
+    </button>
+    <button class="activity-btn" data-mult="1.725" data-label="very active">
+      <div class="name">Very active</div>
+      <div class="desc">Exercise 6-7 days/wk</div>
+    </button>
+    <button class="activity-btn span-2" data-mult="1.9" data-label="athlete">
+      <div class="name">Athlete / physical job</div>
+      <div class="desc">2x/day training or hard manual labor</div>
+    </button>
+  </div>
+
+  <div class="result-card">
+    <div class="result-main">
+      <div class="result-label">Maintenance calories</div>
+      <div class="result-number"><span id="tdee">2,592</span> <span class="result-unit">kcal/day</span></div>
+      <div class="result-meta">BMR: <span id="bmr">1,672</span> kcal · Activity: <span id="mult-label">moderate</span></div>
+    </div>
+
+    <div class="goal-grid">
+      <div class="goal-card">
+        <div class="goal-label">Cut</div>
+        <div class="goal-value" id="cut">1,842</div>
+        <div class="goal-pace">−750 kcal</div>
+      </div>
+      <div class="goal-card featured">
+        <div class="goal-label">Maintain</div>
+        <div class="goal-value" id="maint">2,592</div>
+        <div class="goal-pace">stay same</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-label">Bulk</div>
+        <div class="goal-value" id="bulk">3,342</div>
+        <div class="goal-pace">+750 kcal</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Estimates only · individual results vary by ~10% based on genetics, NEAT, and body composition</div>
+</div>
+
+<script>
+(function() {
+  const state = {
+    sex: 'male',
+    unit: 'imperial',
+    age: 30,
+    heightIn: 70,
+    weightLb: 170,
+    multiplier: 1.55,
+    multLabel: 'moderate'
+  };
+
+  const $ = (id) => document.getElementById(id);
+
+  function calc() {
+    const heightCm = state.unit === 'imperial' ? state.heightIn * 2.54 : state.heightIn;
+    const weightKg = state.unit === 'imperial' ? state.weightLb * 0.453592 : state.weightLb;
+
+    let bmr;
+    if (state.sex === 'male') {
+      bmr = 10 * weightKg + 6.25 * heightCm - 5 * state.age + 5;
+    } else {
+      bmr = 10 * weightKg + 6.25 * heightCm - 5 * state.age - 161;
+    }
+
+    const tdee = bmr * state.multiplier;
+    $('bmr').textContent = Math.round(bmr).toLocaleString();
+    $('tdee').textContent = Math.round(tdee).toLocaleString();
+    $('mult-label').textContent = state.multLabel;
+    $('cut').textContent = Math.round(tdee - 750).toLocaleString();
+    $('maint').textContent = Math.round(tdee).toLocaleString();
+    $('bulk').textContent = Math.round(tdee + 750).toLocaleString();
+  }
+
+  function updateLabels() {
+    $('age-out').textContent = state.age + ' years';
+    if (state.unit === 'imperial') {
+      const ft = Math.floor(state.heightIn / 12);
+      const inch = state.heightIn % 12;
+      $('height-out').textContent = ft + "'" + inch + '"';
+      $('weight-out').textContent = state.weightLb + ' lbs';
+    } else {
+      $('height-out').textContent = Math.round(state.heightIn) + ' cm';
+      $('weight-out').textContent = Math.round(state.weightLb) + ' kg';
+    }
+  }
+
+  function setActive(group, target) {
+    group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    target.classList.add('active');
+  }
+
+  $('sex-group').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    state.sex = btn.dataset.sex;
+    setActive($('sex-group'), btn);
+    calc();
+  });
+
+  $('unit-group').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const newUnit = btn.dataset.unit;
+    if (newUnit === state.unit) return;
+
+    if (newUnit === 'metric') {
+      const cm = Math.round(state.heightIn * 2.54);
+      const kg = Math.round(state.weightLb * 0.453592);
+      $('height').min = 122; $('height').max = 213; $('height').value = cm;
+      $('weight').min = 36; $('weight').max = 180; $('weight').value = kg;
+      state.heightIn = cm;
+      state.weightLb = kg;
+    } else {
+      const inches = Math.round(state.heightIn / 2.54);
+      const lbs = Math.round(state.weightLb / 0.453592);
+      $('height').min = 48; $('height').max = 84; $('height').value = inches;
+      $('weight').min = 80; $('weight').max = 400; $('weight').value = lbs;
+      state.heightIn = inches;
+      state.weightLb = lbs;
+    }
+    state.unit = newUnit;
+    setActive($('unit-group'), btn);
+    updateLabels();
+    calc();
+  });
+
+  $('age').addEventListener('input', (e) => {
+    state.age = parseInt(e.target.value);
+    updateLabels();
+    calc();
+  });
+
+  $('height').addEventListener('input', (e) => {
+    state.heightIn = parseInt(e.target.value);
+    updateLabels();
+    calc();
+  });
+
+  $('weight').addEventListener('input', (e) => {
+    state.weightLb = parseInt(e.target.value);
+    updateLabels();
+    calc();
+  });
+
+  $('activity-grid').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    state.multiplier = parseFloat(btn.dataset.mult);
+    state.multLabel = btn.dataset.label;
+    setActive($('activity-grid'), btn);
+    calc();
+  });
+
+  updateLabels();
+  calc();
+})();
+</script>
+
+</body>
+</html>
